@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cody Stahl · Technical Product Manager, Solutions Architect, Implementation Consultant</title>
+<meta name="description" content="Cody Stahl: Technical Product Manager, Solutions Architect, and Implementation Consultant. Building systems for mission-driven organizations, from the server room to the field.">
+<script>
+  // The page follows the visitor's system setting unless they picked a theme here before.
+  try {
+    var saved = localStorage.getItem("theme");
+    if (saved === "dark" || saved === "light") document.documentElement.dataset.theme = saved;
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --ink: #1d2433;
+    --ink-soft: #4b5468;
+    --ink-faint: #6b7385;
+    --border: #e4e6ea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #14161d;
+      --ink: #eceef4;
+      --ink-soft: #b6bcc9;
+      --ink-faint: #9299a8;
+      --border: #2f3340;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #14161d;
+    --ink: #eceef4;
+    --ink-soft: #b6bcc9;
+    --ink-faint: #9299a8;
+    --border: #2f3340;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    place-items: center;
+    padding: 24px;
+  }
+  .copyright {
+    color: var(--ink-faint);
+    font-size: .8rem;
+    text-align: center;
+    padding-top: 24px;
+  }
+  main { width: 100%; max-width: 920px; text-align: center; }
+  h1 {
+    font-size: clamp(2.6rem, 9vw, 4rem);
+    font-weight: 700;
+    letter-spacing: -.02em;
+    line-height: 1.05;
+  }
+  .titles {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px 0;
+    margin-top: .9rem;
+    color: var(--ink-faint);
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .titles li { white-space: nowrap; }
+  .titles li + li::before { content: "·"; margin: 0 .9em; }
+  .lead {
+    font-size: clamp(1.2rem, 2.2vw, 1.4rem);
+    font-weight: 600;
+    line-height: 1.4;
+    text-wrap: balance;
+    margin-top: 2rem;
+  }
+  .links {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px 0;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  @media (max-width: 700px) {
+    .titles { flex-direction: column; }
+    .titles li + li::before { content: none; }
+    .links { grid-template-columns: 1fr; }
+  }
+  .links a {
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--border);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .links a:hover,
+  .links a:focus-visible { text-decoration-color: var(--ink); }
+  .links a:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    font: inherit;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--ink-faint);
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  .theme-toggle:hover,
+  .theme-toggle:focus-visible { color: var(--ink); border-color: var(--ink-faint); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" id="theme-toggle" aria-pressed="false">Dark mode</button>
+<main>
+  <h1>Cody Stahl</h1>
+  <ul class="titles">
+    <li>Technical Product Manager</li>
+    <li>Solutions Architect</li>
+    <li>Implementation Consultant</li>
+  </ul>
+  <p class="lead">Building systems for mission-driven organizations, from the server room to the field.</p>
+  <ul class="links">
+    <li><a href="mailto:cody.jane.stahl@gmail.com">cody.jane.stahl@gmail.com</a></li>
+    <li><a href="https://www.linkedin.com/in/cody-stahl">linkedin.com/in/cody-stahl</a></li>
+    <li><a href="https://github.com/karmuno">github.com/karmuno</a></li>
+  </ul>
+</main>
+<footer class="copyright">© 2026 Cody Stahl</footer>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var button = document.getElementById("theme-toggle");
+    var system = window.matchMedia("(prefers-color-scheme: dark)");
+    function isDark() {
+      if (root.dataset.theme) return root.dataset.theme === "dark";
+      return system.matches;
+    }
+    function render() {
+      var dark = isDark();
+      button.textContent = dark ? "Light mode" : "Dark mode";
+      button.setAttribute("aria-pressed", dark ? "true" : "false");
+    }
+    button.addEventListener("click", function () {
+      var next = isDark() ? "light" : "dark";
+      root.dataset.theme = next;
+      try { localStorage.setItem("theme", next); } catch (e) {}
+      render();
+    });
+    if (system.addEventListener) system.addEventListener("change", render);
+    render();
+  })();
+</script>
+</body>
+</html>
