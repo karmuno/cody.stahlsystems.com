@@ -1,0 +1,517 @@
+/* Writing portfolio stylesheet
+   No bold anywhere: only Regular and Italic ship of each family, so
+   font-weight:700 would render as synthesised faux-bold. */
+
+/* ---------- Faces ----------
+   Atkinson Hyperlegible (Braille Institute, OFL) is the DEFAULT. It was drawn
+   for low vision, with unambiguously distinct I/l/1 and O/0, and it is only
+   35 KB for both styles. Making it the default rather than an opt-in means the
+   accessible letterforms are what everyone gets, instead of only the readers
+   who find a control in the footer.
+
+   Chosen over OpenDyslexic deliberately. British Dyslexia Association guidance
+   is about sans-serif letterforms and generous spacing, not a special face, and
+   the studies on OpenDyslexic specifically (Rello & Baeza-Yates 2013; Wery &
+   Diliberto 2017) find no reading-speed advantage over a well-set sans.
+
+   Literata is the opt-in alternative. Drawn by TypeTogether for Google Play
+   Books, so it is engineered for long-form screen reading rather than adapted
+   from print. Declared here but NOT fetched
+   unless html[data-font="serif"] is set — a browser only downloads a face it
+   actually renders — so the default reader never pays its 92 KB (PRD RO-5). */
+
+@font-face{
+  font-family:"Literata";
+  src:url(/writing/fonts/literata-regular.e618d80055.woff2) format("woff2");
+  font-weight:400;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:"Literata";
+  src:url(/writing/fonts/literata-italic.99fa032066.woff2) format("woff2");
+  font-weight:400;font-style:italic;font-display:swap;
+}
+@font-face{
+  font-family:"Atkinson Hyperlegible";
+  src:url(/writing/fonts/atkinson-hyperlegible-regular.d64ba838ef.woff2) format("woff2");
+  font-weight:400;font-style:normal;font-display:swap;
+}
+@font-face{
+  font-family:"Atkinson Hyperlegible";
+  src:url(/writing/fonts/atkinson-hyperlegible-italic.bc8825fd43.woff2) format("woff2");
+  font-weight:400;font-style:italic;font-display:swap;
+}
+
+/* ---------- Tokens ---------- */
+
+/* Default: Atkinson, set with the generous spacing that is where most of the
+   real legibility benefit lives (BDA guidance) — looser leading, slight
+   positive tracking, open word spacing, and a measure short enough to make
+   line-to-line return easy. */
+:root{
+  /* MEASURED, not guessed. CSS `ch` is the width of the "0" glyph, which is
+     ~1.56x the average character in running text — so 64ch renders ~89
+     characters, not 64. These values were measured against the actual content
+     in the actual face: 43ch = ~66 characters of prose (TY-1: 60-70), and 56ch
+     holds Eye on the Bride's 79-character line (571px) unwrapped (VF-3). */
+  /* Calibrated against svpg.com, which Cody gave as the reference: it runs 90
+     characters at 18px in a 736px column. We match the character count but not
+     its leading — svpg sets 1.33, which is tight for a line that long. At 1.72
+     the eye finds the next line reliably, so a long measure costs much less.
+     Grows with the viewport; capped so it cannot run past ~90. */
+  --measure-prose:clamp(62ch, 36ch + 19vw, 78ch);
+  --measure-verse:clamp(60ch, 42ch + 13vw, 68ch);
+
+  /* Minimum breathing room at the viewport edges. The column is centred; this
+     is just the gutter it must never cross. */
+  --page-inset:1.25rem;
+
+  --font-body:"Atkinson Hyperlegible",Verdana,Tahoma,sans-serif;
+  --leading:1.72;
+  --track:.008em;
+  --word-space:.04em;
+
+  /* AAA (7:1) for body and framing; meta clears 7:1 too. */
+  --bg:#fdfcfa; --ink:#1b1a18; --ink-soft:#514d45; --ink-faint:#57534a; --rule:#ddd8cd;
+}
+/* Three states. Auto follows the OS; an explicit choice disables the media
+   query outright via :not([data-theme]), and the light block below re-declares
+   the defaults so "Light" sticks on a machine set to dark. Pattern borrowed
+   from BeowulfTranslator's tokens.css.
+
+   color-scheme is the part that is easy to forget: without it the browser's own
+   scrollbars, focus rings and form controls stay in the OS theme, so a reader
+   who forces Light on a dark machine gets dark scrollbars framing a light page. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme]){
+    --bg:#15161a; --ink:#e8e6e1; --ink-soft:#b8b4ab; --ink-faint:#aaa69e; --rule:#33363d;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15161a; --ink:#e8e6e1; --ink-soft:#b8b4ab; --ink-faint:#aaa69e; --rule:#33363d;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#fdfcfa; --ink:#1b1a18; --ink-soft:#514d45; --ink-faint:#57534a; --rule:#ddd8cd;
+  color-scheme:light;
+}
+
+/* Opt-in serif. The whole setting moves, not just the family: a serif wants a
+   slightly larger size, tighter leading, no added tracking, and a wider measure
+   than the sans (PRD RO-8). */
+html[data-font="serif"]{
+  --font-body:"Literata","Iowan Old Style",Georgia,"Times New Roman",serif;
+  --leading:1.62;
+  --track:0;
+  --word-space:0;
+  /* Literata's ch ratio is 0.831 vs Atkinson's 0.693, so the same ch value
+     renders ~20% more characters. Measured, not converted. */
+  --measure-prose:clamp(74ch, 43ch + 22vw, 93ch);
+  --measure-verse:clamp(66ch, 47ch + 15vw, 76ch);
+  font-size:clamp(17.5px, 0.45vw + 14.4px, 22px);
+}
+
+*{box-sizing:border-box}
+html{font-size:clamp(16.5px, 0.42vw + 13.6px, 21px)}
+
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-body);
+  font-optical-sizing:auto;
+  line-height:var(--leading);
+  letter-spacing:var(--track);
+  word-spacing:var(--word-space);
+  -webkit-text-size-adjust:100%;
+}
+
+/* One page column, shared by every page type. The column is centred; the text
+   inside it is left-aligned to the column's edge and rags right at whatever
+   measure its form wants. That keeps the left margin identical whether you are
+   reading a 44-line poem or a 2,642-word story — the alternative, centring each
+   measure independently, made the text jump sideways as you moved through the
+   set. */
+/* The column takes the width of whatever form the page holds, and is centred.
+   Consequence worth knowing: because prose and verse need different measures,
+   centring each means their left edges differ between a poem page and a story
+   page. Centring the block won and the shared left edge lost — they cannot
+   both be true unless the two forms share a width, which they cannot, since
+   prose must stay near 70 characters and verse must hold a 79-character line
+   unwrapped. */
+main{
+  width:min(100% - 2 * var(--page-inset), var(--measure-prose));
+  margin:0 auto;
+  padding:4rem 0 2rem;
+}
+.form-poem main,.form-song main{
+  width:min(100% - 2 * var(--page-inset), var(--measure-verse));
+}
+h1{
+  font-size:2rem;font-weight:400;letter-spacing:-.012em;line-height:1.18;margin:0 0 .8em;
+  text-wrap:balance;
+}
+p{text-wrap:pretty}
+a{color:inherit}
+a:focus-visible,button:focus-visible,[tabindex]:focus-visible{
+  outline:2px solid var(--ink);outline-offset:3px;border-radius:2px;
+}
+
+/* Visually hidden until focused. Makes the reading-options control the first
+   focusable thing on the page, so it is reachable before the work rather than
+   after 2,600 words (PRD RO-2). */
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:10;
+  background:var(--bg);color:var(--ink);border:1px solid var(--ink);
+  padding:.6em 1em;font-size:.85rem;text-decoration:none;
+}
+.skip:focus{left:.75rem;top:.75rem}
+.skip:nth-of-type(2):focus{left:11rem}
+
+/* ---------- Site header ----------
+   On every page, at the top of the page. NOT sticky: it scrolls away with the
+   content, so nothing follows the reader down a 2,642-word story. */
+
+.site{
+  position:relative;
+  border-bottom:1px solid var(--rule);
+  font-size:.8rem;
+}
+.site-inner{
+  width:min(100% - 2 * var(--page-inset), 68rem);
+  margin:0 auto;padding:.6rem 0;
+  display:flex;gap:1rem 1.5rem;align-items:baseline;
+  justify-content:center;flex-wrap:wrap;
+}
+.site-name{
+  font-size:1.15em;text-decoration:none;letter-spacing:.01em;
+  color:var(--ink);white-space:nowrap;
+}
+.site-contact a{font-size:.95em}
+.site-contact{display:flex;gap:1.1rem;flex-wrap:wrap}
+.site-contact a{color:var(--ink-faint);text-decoration:none;border-bottom:1px solid transparent}
+.site-contact a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+
+.site-works{
+  width:min(100% - 2 * var(--page-inset), 68rem);
+  margin:0 auto;padding:.5rem 0 .55rem;
+  display:flex;gap:.35rem 1rem;justify-content:center;flex-wrap:wrap;
+  border-top:1px solid var(--rule);
+}
+.site-works a{
+  color:var(--ink-faint);text-decoration:none;
+  border-bottom:1px solid transparent;padding:.15em 0;
+}
+.site-works a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+.site-works a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* The header already establishes the page; the work does not need to start
+   four rems below it as well. */
+.piece main{padding-top:2.75rem}
+
+/* ---------- Measures ---------- */
+
+.piece article{margin:0;max-width:100%}
+.index-wrap{max-width:100%;margin:0}
+
+/* ---------- Verse ----------
+   One element per authored line. The hanging indent is what distinguishes a
+   wrapped line from an authored break; if you cannot tell them apart at 375px,
+   the poem is being misrepresented. */
+
+.stanza{margin:0 0 1.9em}
+.stanza .l{display:block;padding-left:1.6em;text-indent:-1.6em}
+.stanza .l+.l{margin-top:.12em}
+
+.piece-four-tourists .stanza{margin-bottom:3.2em}
+/* Atkinson has no small-caps, so the default treatment is uppercase at a
+   smaller size. The serif setting gets true small-caps instead. */
+.piece-four-tourists .stanza .l:first-child{
+  text-transform:uppercase;font-size:.8em;letter-spacing:.16em;
+  color:var(--ink-soft);padding-left:0;text-indent:0;margin-bottom:.75em;
+}
+html[data-font="serif"] .piece-four-tourists .stanza .l:first-child{
+  text-transform:none;font-variant:small-caps;font-size:1em;letter-spacing:.09em;
+}
+
+/* ---------- Prose ----------
+   Paragraphs are spaced, never indented. "The butcher cries." in Our Holy
+   Mother depends on the vertical gap to read as an isolated beat; a
+   first-line-indent style absorbs it. Do not add text-indent here. */
+
+.piece p{margin:0 0 1.15em}
+
+hr.scene{border:0;margin:2.4em 0;text-align:center}
+hr.scene::after{content:"* * *";color:var(--ink-faint);letter-spacing:.5em}
+
+/* No italics, no quote marks, no left border — each reads as an epigraph,
+   which DESIGN-DECISIONS §4 rules out by name. */
+.framing{font-size:.95em;line-height:1.5;color:var(--ink-soft);margin:0 0 1.4em;max-width:60ch}
+.meta{font-size:.78em;letter-spacing:.06em;color:var(--ink-faint);margin:0 0 2.6em}
+.standfirst{font-size:1.05em;color:var(--ink-soft);margin:0 0 1rem;max-width:56ch}
+.piece-head h1{margin-bottom:.45em}
+
+/* ---------- Index ---------- */
+
+.pieces{list-style:none;padding:0;margin:2.75rem 0 0;counter-reset:piece}
+.pieces li{margin:0 0 2.9rem;position:relative}
+.pieces h2{font-size:1.32rem;font-weight:400;margin:0 0 .4rem;line-height:1.25}
+.pieces a{text-decoration:none;border-bottom:1px solid var(--rule)}
+.pieces a:hover{border-bottom-color:var(--ink)}
+.pieces .framing{margin-bottom:.45em}
+.pieces .meta{margin-bottom:0}
+
+/* ---------- Index: the whole portfolio on one screen ----------
+   Six entries stacked in one column ran past 1200px, so a laptop reader had to
+   scroll to learn the set existed -- the one thing the index is for (G2).
+
+   Two columns, filled DOWN then across: 1,2,3 | 4,5,6. Column flow rather than
+   row flow keeps 1-2-3 vertically adjacent, which preserves the seam
+   DESIGN-DECISIONS §3 asks for -- A Priesthood ends on "Physical intimacy in a
+   heat-dead universe" and Can't Get Started opens on "I can't get started on
+   anything". Row flow put those two diagonally opposite each other.
+
+   Vertical rhythm is keyed to viewport HEIGHT, not width. A fixed set of sizes
+   fitted a 1366x768 laptop by 27px and still clipped the last line on a screen
+   with a bookmarks bar; guessing the reader's chrome height is a losing game.
+   Every vertical value below is clamp(floor, Nvh, ceiling), so a short screen
+   tightens itself and a tall one uses the room. Measured: fits from 560px of
+   usable height upward, with the framing scaling 15.1px to 18.9px.
+
+   The 58rem container is a width decision and stays fixed: wider pushed the
+   framing lines past 80 characters, and those six lines are meant to scan as
+   one voice. At 58rem the columns run 75 characters. */
+@media (min-width:62rem){
+  .index main{
+    width:min(100% - 2 * var(--page-inset), 58rem);
+    padding-top:clamp(.4rem, 2.4vh, 1.8rem);
+  }
+  .index-wrap{max-width:100%}
+  .index h1{
+    font-size:clamp(1.12rem, 4.4vh, 1.82rem);
+    margin-bottom:clamp(.12em, .8vh, .3em);
+  }
+  .index .standfirst{
+    font-size:clamp(.8em, 2.9vh, 1.12em);
+    margin-bottom:clamp(.12rem, .8vh, .35rem);
+  }
+  .index .print-all{margin-top:clamp(.12rem, .8vh, .35rem);font-size:.78em}
+
+  .pieces{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:repeat(3, auto);
+    grid-auto-flow:column;
+    column-gap:2.8rem;
+    row-gap:clamp(.35rem, 2.2vh, 1.55rem);
+    margin-top:clamp(.35rem, 2.3vh, 1.5rem);
+  }
+  .pieces li{margin:0}
+  .pieces h2{
+    font-size:clamp(.94rem, 3.3vh, 1.4rem);
+    margin-bottom:clamp(.1rem, .6vh, .3rem);
+    line-height:1.25;
+  }
+  .pieces .framing{
+    font-size:clamp(.73em, 2.55vh, 1.04em);
+    line-height:1.42;
+    margin-bottom:clamp(.12em, .7vh, .34em);
+    max-width:none;
+  }
+  .pieces .meta{font-size:.7em;margin-bottom:0}
+}
+
+/* ---------- Pager, footer ---------- */
+
+.pager{
+  max-width:100%;margin:4rem 0 0;padding:1.4rem 0 0;
+  border-top:1px solid var(--rule);
+  display:grid;grid-template-columns:1fr auto 1fr;gap:.6rem 1.5rem;
+  align-items:baseline;font-size:.85em;
+}
+.pager .prev{grid-column:1;justify-self:start}
+.pager .home{grid-column:2;justify-self:center;text-align:center}
+.pager .next{grid-column:3;justify-self:end;text-align:right}
+@media (max-width:30rem){
+  .pager{grid-template-columns:1fr;justify-items:center;text-align:center}
+  .pager .prev,.pager .home,.pager .next{grid-column:1;justify-self:center;text-align:center}
+}
+.pager a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid var(--rule)}
+.pager a:hover{color:var(--ink);border-bottom-color:var(--ink)}
+
+footer{
+  width:min(100% - 2 * var(--page-inset), var(--measure-prose));
+  margin:2.5rem auto 3rem;padding:1.4rem 0 0;
+  border-top:1px solid var(--rule);
+  font-size:.8em;color:var(--ink-faint);
+  text-align:center;
+}
+footer a{color:inherit}
+.footer-links{display:flex;gap:1.4rem;justify-content:center;flex-wrap:wrap}
+.footer-links a{text-decoration:none;border-bottom:1px solid transparent}
+.footer-links a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+.copyright{margin:.9rem 0 0;letter-spacing:.02em}
+
+/* ---------- Reading options (built by a11y.js; absent without JS) ---------- */
+
+/* Top-right, and the ONLY thing that follows the reader down the page --
+   position:fixed rather than the header's sticky, which was removed on purpose.
+   Deliberately the quietest thing on screen: smaller than the name, in the
+   faint ink, no box until it needs one.
+
+   It does need a backing, because unlike everything else here it sits over
+   moving text. The tint is the page background at 90% with a blur behind it,
+   so it reads as the page thinning out rather than as a panel laid on top. The
+   solid declaration first is the fallback where color-mix is unsupported. */
+.site-controls{
+  position:fixed;top:0;right:var(--page-inset);z-index:20;
+  display:flex;gap:1rem;align-items:center;
+  font-size:.85em;
+  padding:.1rem .7rem .3rem;
+  border-radius:0 0 5px 5px;
+  background:var(--bg);
+  background:color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+.ro-toggle{
+  font:inherit;background:none;border:0;padding:.45rem 0;
+  color:var(--ink-faint);cursor:pointer;white-space:nowrap;
+  border-bottom:1px solid transparent;
+  min-height:24px;          /* WCAG 2.5.8 target size, without looking like a box */
+}
+.ro-toggle:hover{color:var(--ink);border-bottom-color:var(--ink-faint)}
+.ro-toggle .ro-value{color:var(--ink-soft)}
+.ro-toggle:hover .ro-value{color:var(--ink)}
+
+/* Print action, sat with the piece metadata rather than floating. Same quiet
+   treatment as the corner toggles. Built by a11y.js, since window.print() needs
+   JS and a dead button would be worse than none. */
+.print-piece{
+  font:inherit;background:none;border:0;padding:0;margin-left:.5em;
+  color:var(--ink-faint);cursor:pointer;
+  border-bottom:1px solid transparent;
+}
+.print-piece:hover{color:var(--ink);border-bottom-color:var(--ink-faint)}
+
+/* Below this width the centred name row would slide under the fixed corner, so
+   the header starts below the band the controls occupy instead. The controls
+   stay fixed -- they are meant to be reachable at any scroll position. */
+@media (max-width:46rem){
+  /* Clearance must exceed the control's own height (~42px), not merely look
+     like it does -- at 1.9rem the centred name slid under it by a pixel. */
+  .site{padding-top:3rem}
+  .site-controls{right:auto;left:50%;transform:translateX(-50%);border-radius:0 0 5px 5px}
+}
+
+/* ---------- Audio player ---------- */
+
+.player{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:0 0 2.2em}
+.player button.play{
+  font:inherit;font-size:.85rem;line-height:1.1;
+  background:none;color:var(--ink-soft);
+  border:1px solid var(--rule);border-radius:999px;
+  padding:.55em 1.15em;min-height:24px;cursor:pointer;
+}
+.player button.play:hover{color:var(--ink);border-color:var(--ink-faint)}
+
+/* The visual track is 2px, but the hit area is 24px tall so it meets the
+   WCAG 2.2 target minimum (PRD AX-8). The line is drawn by a pseudo-element
+   centred inside the taller box, not by the box itself. */
+.player .bar{
+  flex:1 1 12rem;max-width:22rem;height:24px;position:relative;
+  background:none;border:0;padding:0;cursor:pointer;
+}
+.player .bar::before{
+  content:"";position:absolute;left:0;right:0;top:11px;height:2px;background:var(--rule);
+}
+.player .bar>span{
+  position:absolute;left:0;top:11px;height:2px;width:0;background:var(--ink-faint);
+}
+/* Clock and "Demo recording" share a baseline and travel together. */
+.player-meta{display:flex;align-items:baseline;gap:.55rem;white-space:nowrap}
+.player .time{
+  font-size:.75em;line-height:1.2;color:var(--ink-faint);
+  font-variant-numeric:tabular-nums;letter-spacing:.03em;
+}
+.player-note{
+  font-size:.75em;line-height:1.2;letter-spacing:.03em;color:var(--ink-faint);margin:0;
+}
+.player-meta .player-note::before{content:"· ";color:var(--rule)}
+.player audio{max-width:100%}
+
+/* ---------- Print ----------
+   PR-1..PR-8. Verse type size is computed per piece by build.py and arrives as
+   --print-verse-pt on the article; see TECH-SPEC §18. */
+
+.print-only{display:none}
+/* Sits under the standfirst now, above the list. Kept quiet: it is a
+   utility, and it must not read as louder than the work below it. */
+.print-all{margin:.7rem 0 0;font-size:.85em}
+.print-all a{color:var(--ink-faint)}
+.printpiece + .printpiece{margin-top:5rem}
+.printpiece .piece-head h2{
+  font-size:2rem;font-weight:400;letter-spacing:-.012em;line-height:1.18;
+  margin:0 0 .45em;text-wrap:balance;
+}
+.print-actions{margin:1.2rem 0 0}
+.print-actions .print-piece{margin-left:0}
+.print-intro{margin-bottom:3rem}
+
+@media print{
+  @page{size:letter;margin:.75in}
+
+  /* Chrome out. Nothing but the work and its header. */
+  .site,.site-controls,.pager,footer,.player,.skip,.print-all,.print-intro,
+  .print-piece{display:none}
+  .print-only{display:block}
+
+  html{font-size:11pt}
+  body{background:#fff;color:#000;line-height:1.45}
+  main{width:auto;max-width:none;margin:0;padding:0}
+  article{max-width:none !important;width:auto !important}
+
+  /* The header block is set in a different family from the body, which is the
+     print-medium substitute for the colour distinction used on screen. Keyed
+     off the body face so the two never collide: serif header against the sans
+     default, sans header if the reader chose the serif. Georgia and the system
+     sans are used rather than the webfonts so nothing has to load to print. */
+  .piece-head{
+    font-family:Georgia,"Times New Roman",serif;
+    border-bottom:.5pt solid #999;padding-bottom:.35em;margin-bottom:1em;
+  }
+  html[data-font="serif"] .piece-head{
+    font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  }
+  .piece-head h1,.piece-head h2{font-size:14.5pt;margin:0 0 .1em;line-height:1.12}
+  .piece-head .byline{font-size:9pt;margin:0 0 .35em;color:#000}
+  .piece-head .framing{font-size:8.5pt;line-height:1.3;color:#333;margin:0 0 .3em;max-width:none}
+  .piece-head .meta{font-size:8pt;color:#555;margin:0;letter-spacing:.04em}
+
+  /* PR-4: at most one Letter page for verse. Size comes from the build. */
+  .form-poem .stanza,.form-song .stanza{
+    font-size:var(--print-verse-pt,11pt);line-height:1.35;margin-bottom:1.1em;
+  }
+  .stanza .l+.l{margin-top:0}
+
+  /* Four Tourists sets in two columns: 44 lines at a 26-character median leaves
+     most of a single column empty while forcing the type down to fit the
+     height. The header spans both. Stanzas fall 17+4 | 19+4. */
+  .piece-four-tourists{column-count:2;column-gap:24pt}
+  .piece-four-tourists .piece-head{column-span:all}
+  .piece-four-tourists .stanza{break-inside:avoid}
+
+  /* Safety net: if the computed size is still wrong for some browser, move the
+     whole poem to the next sheet rather than splitting it across two. */
+  .form-poem article,.form-song article,
+  .printpiece.form-poem,.printpiece.form-song{break-inside:avoid}
+  .stanza{break-inside:avoid}
+  .piece-head{break-after:avoid}
+  .piece p{orphans:2;widows:2;margin:0 0 .8em}
+  hr.scene{margin:1.4em 0}
+
+  /* PR-6: one work per sheet on /print. */
+  .printpiece{break-before:page;margin-top:0}
+  .printpiece:first-of-type{break-before:auto}
+
+  a[href]::after{content:""}
+  a{text-decoration:none;color:#000}
+}
